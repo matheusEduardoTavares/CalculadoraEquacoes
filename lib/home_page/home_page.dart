@@ -149,7 +149,7 @@ class _HomePageState extends State<HomePage> {
                             child: TextFormField(
                               decoration: InputDecoration(
                                 border: OutlineInputBorder(),
-                                hintText: 'Digite o valor de A',
+                                labelText: 'Digite o valor de A',
                               ),
                               validator: _validateNumber,
                               keyboardType: TextInputType.numberWithOptions(decimal: true, signed: true),
@@ -165,7 +165,7 @@ class _HomePageState extends State<HomePage> {
                             child: TextFormField(
                               decoration: InputDecoration(
                                 border: OutlineInputBorder(),
-                                hintText: 'Digite o valor de B',
+                                labelText: 'Digite o valor de B',
                               ),
                               validator: _validateNumber,
                               keyboardType: TextInputType.numberWithOptions(decimal: true, signed: true),
@@ -182,7 +182,7 @@ class _HomePageState extends State<HomePage> {
                               child: TextFormField(
                                 decoration: InputDecoration(
                                   border: OutlineInputBorder(),
-                                  hintText: 'Digite o valor de C',
+                                  labelText: 'Digite o valor de C',
                                 ),
                                 validator: _validateNumber,
                                 keyboardType: TextInputType.numberWithOptions(decimal: true, signed: true),
@@ -199,7 +199,7 @@ class _HomePageState extends State<HomePage> {
                               child: TextFormField(
                                 decoration: InputDecoration(
                                   border: OutlineInputBorder(),
-                                  hintText: 'Intervalo de X de 0 até',
+                                  labelText: 'Intervalo de X de 0 até',
                                 ),
                                 validator: _validateInt,
                                 keyboardType: TextInputType.number,
