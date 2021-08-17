@@ -50,7 +50,8 @@ class _HomePageState extends State<HomePage> {
     }
 
     if (delta == 0) {
-      return [delta];
+      final x = -_bValue / (2 * _aValue);
+      return [x];
     }
 
     final x1 = (-_bValue + sqrt(delta)) / 2 * _aValue;
@@ -93,26 +94,18 @@ class _HomePageState extends State<HomePage> {
       print('_sum = $_sum');
     }
     else {
-      try {
-        final sum = _secondDegreeCalculate();
+      final sum = _secondDegreeCalculate();
         setState(() {
           if (sum == null) {
             _sum = 'Delta menor que 0, logo, não tem valores de X';
           }
-          else if (_sum.length == 1) {
+          else if (sum.length == 1) {
             _sum = 'Delta = 0, então só tem X = $sum';
           }
           else {
             _sum = 'Solução: {${sum[0]}, ${sum[1]}}';
           }   
         });
-      }
-      catch(_) {
-        showDialog(
-          context: context, 
-          builder: (_) => Text('Erro no cáculo'),
-        );
-      }
     }
   }
 
