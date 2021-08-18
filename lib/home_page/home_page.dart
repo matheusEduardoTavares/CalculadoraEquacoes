@@ -1,6 +1,7 @@
-import 'dart:math';
-
+import 'package:calculadora_equacoes/home_page/home_page_controller.dart';
+import 'package:calculadora_equacoes/home_page/utils/form_utils/custom_validators/custom_validators.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({ 
@@ -12,217 +13,108 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  var _isFirstDegreeEquation = true;
-  final _formKey = GlobalKey<FormState>();
-  double _aValue;
-  double _bValue;
-  double _cValue;
-  int _quantity;
-  String _sum;
-
-  @override 
-  void initState() {
-    print('aqui');
-
-    super.initState();
-  }
-
-  String _validateNumber(String text) {
-    if (double.tryParse(text) == null) {
-      return 'Apenas números reais';
-    }
-
-    return null;
-  }
-
-  String _validateInt(String text) {
-    if (int.tryParse(text) == null) {
-      return 'Apenas números inteiros';
-    }
-
-    return null;
-  }
-
-  List<double> _secondDegreeCalculate() {
-    final delta = (_bValue * _bValue) - 4 * _aValue * _cValue;
-    if (delta < 0) {
-      return null;
-    }
-
-    if (delta == 0) {
-      final x = -_bValue / (2 * _aValue);
-      return [x];
-    }
-
-    final x1 = (-_bValue + sqrt(delta)) / 2 * _aValue;
-    final x2 = (-_bValue - sqrt(delta)) / 2 * _aValue;
-    return [x1, x2];
-  }
-
-  String _firstDegreeCalculate() {
-    var _totalCalc = '';
-    for (var x = 0; x < _quantity; x++) {
-      final _calc = (_aValue * x) + _bValue;
-      _totalCalc += '$_calc | ';
-    }
-    return _totalCalc;
-  }
-
-  void _calculate() {
-    if (!_formKey.currentState.validate()) {
-      return;
-    }
-    _formKey.currentState.save();
-
-    if (_isFirstDegreeEquation) {
-      try {
-        final sum = _firstDegreeCalculate();
-        setState(() {
-          _sum = sum;
-        });
-      }
-      catch(_) {
-        showDialog(
-          context: context, 
-          builder: (_) => AlertDialog(
-            title: Text('Erro no cáculo'),
-            content: const Text('Houve algum erro no cálculo'),
-          ),
-        );
-      }
-
-      print('_sum = $_sum');
-    }
-    else {
-      final sum = _secondDegreeCalculate();
-        setState(() {
-          if (sum == null) {
-            _sum = 'Delta menor que 0, logo, não tem valores de X';
-          }
-          else if (sum.length == 1) {
-            _sum = 'Delta = 0, então só tem X = $sum';
-          }
-          else {
-            _sum = 'Solução: {${sum[0]}, ${sum[1]}}';
-          }   
-        });
-    }
-  }
-
-  void _changeEquation() {
-    setState(() {
-      _sum = null;
-      _isFirstDegreeEquation = !_isFirstDegreeEquation;
-    });
-  }
+  
+  final _homeController = HomePageController();
   
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_isFirstDegreeEquation ? 'Calculadora de primeiro grau' : 'Calculadora de segundo grau'),
+        title: Observer(
+          builder: (_) {
+            return Text(_homeController.appBarTitle);
+          }
+        ),
         centerTitle: true,
       ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 10.0),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 10.0),
-                            child: TextFormField(
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(),
-                                labelText: 'Digite o valor de A',
-                              ),
-                              validator: _validateNumber,
-                              keyboardType: TextInputType.numberWithOptions(decimal: true, signed: true),
-                              onSaved: (value) {
-                                setState(() {
-                                  _aValue = double.parse(value);
-                                });
-                              },
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 10.0),
-                            child: TextFormField(
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(),
-                                labelText: 'Digite o valor de B',
-                              ),
-                              validator: _validateNumber,
-                              keyboardType: TextInputType.numberWithOptions(decimal: true, signed: true),
-                              onSaved: (value) {
-                                setState(() {
-                                  _bValue = double.parse(value);
-                                });
-                              },
-                            ),
-                          ),
-                          if (!_isFirstDegreeEquation)
+          child: Observer(
+            builder: (_) => Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 10.0),
+                      child: Form(
+                        key: _homeController.formKey,
+                        child: Column(
+                          children: [
                             Padding(
                               padding: const EdgeInsets.only(bottom: 10.0),
                               child: TextFormField(
                                 decoration: InputDecoration(
                                   border: OutlineInputBorder(),
-                                  labelText: 'Digite o valor de C',
+                                  labelText: 'Digite o valor de A',
                                 ),
-                                validator: _validateNumber,
+                                validator: CustomValidators.validateDouble,
                                 keyboardType: TextInputType.numberWithOptions(decimal: true, signed: true),
-                                onSaved: (value) {
-                                  setState(() {
-                                    _cValue = double.parse(value);
-                                  });
-                                },
+                                onSaved: _homeController.setAValue,
                               ),
-                            )
-                          else 
+                            ),
                             Padding(
                               padding: const EdgeInsets.only(bottom: 10.0),
                               child: TextFormField(
                                 decoration: InputDecoration(
                                   border: OutlineInputBorder(),
-                                  labelText: 'Intervalo de X de 0 até',
+                                  labelText: 'Digite o valor de B',
                                 ),
-                                validator: _validateInt,
-                                keyboardType: TextInputType.number,
-                                onSaved: (value) {
-                                  setState(() {
-                                    _quantity = int.parse(value);
-                                  });
-                                },
+                                validator: CustomValidators.validateDouble,
+                                keyboardType: TextInputType.numberWithOptions(decimal: true, signed: true),
+                                onSaved: _homeController.setBValue,
                               ),
                             ),
-                        ],
+                            if (!_homeController.isFirstDegreeEquation)
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 10.0),
+                                child: TextFormField(
+                                  decoration: InputDecoration(
+                                    border: OutlineInputBorder(),
+                                    labelText: 'Digite o valor de C',
+                                  ),
+                                  validator: CustomValidators.validateDouble,
+                                  keyboardType: TextInputType.numberWithOptions(decimal: true, signed: true),
+                                  onSaved: _homeController.setCValue,
+                                ),
+                              )
+                            else 
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 10.0),
+                                child: TextFormField(
+                                  decoration: InputDecoration(
+                                    border: OutlineInputBorder(),
+                                    labelText: 'Intervalo de X de 1 até',
+                                  ),
+                                  validator: CustomValidators.validateInt,
+                                  keyboardType: TextInputType.number,
+                                  onSaved: _homeController.setFirstDegreeQuantityGenerateNumbersValue,
+                                ),
+                              ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              ElevatedButton(
-                onPressed: _calculate, 
-                child: const Text('Calcular'),
-              ),
-              const SizedBox(height: 10,),
-              ElevatedButton(
-                onPressed: _changeEquation, 
-                child: Text(_isFirstDegreeEquation ? 'Trocar para equação do segundo grau' : 'Trocar para equação do primeiro grau'),
-              ),
-              const SizedBox(height: 10,),
-              Expanded(child: Text(
-                'Resultado: ${_sum ?? "Não somado"}'
-              )),
-            ],
+                ElevatedButton(
+                  onPressed: _homeController.calculate, 
+                  child: const Text('Calcular'),
+                ),
+                const SizedBox(height: 10,),
+                ElevatedButton(
+                  onPressed: _homeController.changeEquation, 
+                  child: Text(_homeController.displayTypeEquationText),
+                ),
+                const SizedBox(height: 10,),
+                Expanded(
+                  child: Text(
+                    _homeController.displayResultText,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
